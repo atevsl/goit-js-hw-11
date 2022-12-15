@@ -10,6 +10,7 @@ const loadMoreButtonEll = document.querySelector('.load-more');
 let page = 1;
 let photo = undefined;
 let pagesLeft = 0;
+let Lightbox;
 const per_page = 40;
 
 formEll.addEventListener('submit', handleSubmit);
@@ -32,8 +33,10 @@ function handleSubmit(e) {
         'beforeend',
         response.data.hits.map(picture => renderpicture(picture)).join('')
       );
-      // onSimpleLightBox();
-      gallery.refresh();
+
+      onSimpleLightBox();
+      // Lightbox.on();
+      // gallery.refresh();
 
       pagesLeft -= per_page;
     }
@@ -42,22 +45,22 @@ function handleSubmit(e) {
 
 function renderpicture(picture) {
   return `<div class="photo-card">
-        <a href=${picture.largeImageURL}><img src=${picture.webformatURL} alt=${picture.tags} loading="lazy" width=270px height=180px/>
-  <div class="info">
-    <p class="info-item">
-        <b>Likes: ${picture.likes}</b>
-    </p>
-    <p class="info-item">
-        <b>Views: ${picture.views}</b>
-    </p>
-    <p class="info-item">
-        <b>Comments: ${picture.comments}</b>
-    </p>
-    <p class="info-item">
-         <b>Downloads: ${picture.downloads}</b>
-    </p>
-  </div></a>
-</div>`;
+          <a href=${picture.largeImageURL}><img src=${picture.webformatURL} alt=${picture.tags} loading="lazy" width=270px height=180px/>
+    <div class="info">
+      <p class="info-item">
+          <b>Likes: ${picture.likes}</b>
+      </p>
+      <p class="info-item">
+          <b>Views: ${picture.views}</b>
+      </p>
+      <p class="info-item">
+          <b>Comments: ${picture.comments}</b>
+      </p>
+      <p class="info-item">
+           <b>Downloads: ${picture.downloads}</b>
+      </p>
+    </div></a>
+  </div>`;
 }
 
 function getImg(photo, page) {
@@ -79,7 +82,9 @@ function handleLoadMore() {
         response.data.hits.map(picture => renderpicture(picture)).join('')
       )
     );
-    gallery.refresh();
+
+    Lightbox.refresh();
+    // onSimpleLightBox();
 
     pagesLeft -= per_page;
   }
@@ -91,10 +96,16 @@ function handleLoadMore() {
 //     captionDelay: 250,
 //   });
 // }
-let gallery = new SimpleLightbox('.photo-card a', {
-  captionsData: 'alt',
-  captionDelay: 250,
-});
+function onSimpleLightBox() {
+  Lightbox = new SimpleLightbox('.photo-card a', {
+    captionsData: 'alt',
+    captionDelay: 250,
+  });
+}
+// let gallery = new SimpleLightbox('.photo-card a', {
+//   captionsData: 'alt',
+//   captionDelay: 250,
+// });
 // var gallery = $('.gallery a').simpleLightbox();
 
 // gallery.refresh();

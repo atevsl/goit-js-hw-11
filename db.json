@@ -1,0 +1,7 @@
+{
+  "picture": [
+    { "id": 1, "webformatURL": "./src/images/1.jpg" },
+    { "id": 2, "webformatURL": "./src/images/2.jpg" },
+    { "id": 3, "webformatURL": "./src/images/3.jpg" }
+  ]
+}
