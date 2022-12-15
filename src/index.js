@@ -1,41 +1,48 @@
 const axios = require('axios').default;
 import Notiflix from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const formEll = document.querySelector('.search-form');
-const srcButtonEll = document.querySelector('.searchButton');
 const galleryEll = document.querySelector('.gallery');
+const loadMoreButtonEll = document.querySelector('.load-more');
+
+let page = 1;
+let photo = undefined;
+let pagesLeft = 0;
+const per_page = 40;
 
 formEll.addEventListener('submit', handleSubmit);
+loadMoreButtonEll.addEventListener('click', handleLoadMore);
 
 function handleSubmit(e) {
   e.preventDefault();
-  const pick = e.currentTarget.elements.searchQuery.value;
-  getImg(pick).then(response => {
-    console.log(response.data.hits.length);
+  page = 1;
+  photo = e.currentTarget.elements.searchQuery.value;
+  galleryEll.innerHTML = '';
+  getImg(photo, page).then(response => {
+    pagesLeft = response.data.totalHits;
     if (response.data.hits.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     } else {
+      Notiflix.Notify.success(`Hooray! We found ${pagesLeft} images.`);
       galleryEll.insertAdjacentHTML(
         'beforeend',
         response.data.hits.map(picture => renderpicture(picture)).join('')
       );
+      // onSimpleLightBox();
+      gallery.refresh();
+
+      pagesLeft -= per_page;
     }
   });
-  // webformatURL - ссылка на маленькое изображение для списка карточек.
-  // largeImageURL - ссылка на большое изображение.
-  // tags - строка с описанием изображения. Подойдет для атрибута alt.
-  // likes - количество лайков.
-  // views - количество просмотров.
-  // comments - количество комментариев.
-  // downloads - количество загрузок.
-  // });
 }
 
 function renderpicture(picture) {
   return `<div class="photo-card">
-        <img src=${picture.webformatURL} alt=${picture.tags} loading="lazy" width=300/>
+        <a href=${picture.largeImageURL}><img src=${picture.webformatURL} alt=${picture.tags} loading="lazy" width=270px height=180px/>
   <div class="info">
     <p class="info-item">
         <b>Likes: ${picture.likes}</b>
@@ -49,15 +56,45 @@ function renderpicture(picture) {
     <p class="info-item">
          <b>Downloads: ${picture.downloads}</b>
     </p>
-  </div>
+  </div></a>
 </div>`;
 }
 
-function getImg(pick) {
-  // return fetch(
-  //   `https://pixabay.com/api/?key=32042597-d449e2f3b6adbf69100237dc7&q=${pick}&image_type=photo&orientation=horizontal&safesearch=true`
-  // ).then(res => res.json());
+function getImg(photo, page) {
   return axios.get(
-    `https://pixabay.com/api/?key=32042597-d449e2f3b6adbf69100237dc7&q=${pick}&image_type=photo&orientation=horizontal&safesearch=true`
+    `https://pixabay.com/api/?key=32042597-d449e2f3b6adbf69100237dc7&q=${photo}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${per_page}`
   );
 }
+
+function handleLoadMore() {
+  page += 1;
+  if (pagesLeft <= 0) {
+    Notiflix.Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
+  } else {
+    getImg(photo, page).then(response =>
+      galleryEll.insertAdjacentHTML(
+        'beforeend',
+        response.data.hits.map(picture => renderpicture(picture)).join('')
+      )
+    );
+    gallery.refresh();
+
+    pagesLeft -= per_page;
+  }
+}
+
+// function onSimpleLightBox() {
+//   new SimpleLightbox('.photo-card a', {
+//     captionsData: 'alt',
+//     captionDelay: 250,
+//   });
+// }
+let gallery = new SimpleLightbox('.photo-card a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
+// var gallery = $('.gallery a').simpleLightbox();
+
+// gallery.refresh();
