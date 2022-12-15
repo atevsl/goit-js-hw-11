@@ -11,6 +11,9 @@
   border: 1px solid black;
   border-radius: 10px;
   overflow: hidden;
+  a {
+    text-decoration: none;
+  }
 }
 .load-more {
   position: absolute;
@@ -26,4 +29,10 @@
   border-radius: 5px;
   cursor: pointer;
   font-size: 20px;
+}
+.info {
+  display: flex;
+  gap: 8px;
+  color: #000;
+  font-size: 10px;
 }

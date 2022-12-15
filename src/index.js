@@ -48,16 +48,16 @@ function renderpicture(picture) {
           <a href=${picture.largeImageURL}><img src=${picture.webformatURL} alt=${picture.tags} loading="lazy" width=270px height=180px/>
     <div class="info">
       <p class="info-item">
-          <b>Likes: ${picture.likes}</b>
+          <b>❤️Likes: ${picture.likes}</b>
       </p>
       <p class="info-item">
-          <b>Views: ${picture.views}</b>
+          <b>👁️Views: ${picture.views}</b>
       </p>
       <p class="info-item">
-          <b>Comments: ${picture.comments}</b>
+          <b>Comments: 🗨️${picture.comments}</b>
       </p>
       <p class="info-item">
-           <b>Downloads: ${picture.downloads}</b>
+           <b>Downloads: ⏬${picture.downloads}</b>
       </p>
     </div></a>
   </div>`;
@@ -97,7 +97,7 @@ function handleLoadMore() {
 //   });
 // }
 function onSimpleLightBox() {
-  Lightbox = new SimpleLightbox('.photo-card a', {
+  new SimpleLightbox('.photo-card a', {
     captionsData: 'alt',
     captionDelay: 250,
   });
