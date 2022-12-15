@@ -1,47 +1,19 @@
 const axios = require('axios').default;
 import Notiflix from 'notiflix';
-import SimpleLightbox from 'simplelightbox';
+import SimpleLightBox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const formEll = document.querySelector('.search-form');
 const galleryEll = document.querySelector('.gallery');
-const loadMoreButtonEll = document.querySelector('.load-more');
+const loadMoreButtonEll = document.querySelector('#load-more');
 
 let page = 1;
 let photo = undefined;
 let pagesLeft = 0;
-let Lightbox;
 const per_page = 40;
 
 formEll.addEventListener('submit', handleSubmit);
 loadMoreButtonEll.addEventListener('click', handleLoadMore);
-
-function handleSubmit(e) {
-  e.preventDefault();
-  page = 1;
-  photo = e.currentTarget.elements.searchQuery.value;
-  galleryEll.innerHTML = '';
-  getImg(photo, page).then(response => {
-    pagesLeft = response.data.totalHits;
-    if (response.data.hits.length === 0) {
-      Notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-    } else {
-      Notiflix.Notify.success(`Hooray! We found ${pagesLeft} images.`);
-      galleryEll.insertAdjacentHTML(
-        'beforeend',
-        response.data.hits.map(picture => renderpicture(picture)).join('')
-      );
-
-      onSimpleLightBox();
-      // Lightbox.on();
-      // gallery.refresh();
-
-      pagesLeft -= per_page;
-    }
-  });
-}
 
 function renderpicture(picture) {
   return `<div class="photo-card">
@@ -69,43 +41,53 @@ function getImg(photo, page) {
   );
 }
 
-function handleLoadMore() {
+async function handleSubmit(e) {
+  e.preventDefault();
+  loadMoreButtonEll.classList.add('hidden');
+  loadMoreButtonEll.classList.remove('load-more');
+
+  page = 1;
+  photo = e.currentTarget.elements.searchQuery.value;
+  galleryEll.innerHTML = '';
+  await getImg(photo, page).then(response => {
+    pagesLeft = response.data.totalHits;
+    if (response.data.hits.length === 0) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    } else {
+      Notiflix.Notify.success(`Hooray! We found ${pagesLeft} images.`);
+      galleryEll.insertAdjacentHTML(
+        'beforeend',
+        response.data.hits.map(picture => renderpicture(picture)).join('')
+      );
+      pagesLeft -= per_page;
+      loadMoreButtonEll.classList.remove('hidden');
+      loadMoreButtonEll.classList.add('load-more');
+    }
+  });
+  lightBox.refresh();
+}
+
+async function handleLoadMore() {
   page += 1;
   if (pagesLeft <= 0) {
     Notiflix.Notify.info(
       "We're sorry, but you've reached the end of search results."
     );
   } else {
-    getImg(photo, page).then(response =>
+    await getImg(photo, page).then(response =>
       galleryEll.insertAdjacentHTML(
         'beforeend',
         response.data.hits.map(picture => renderpicture(picture)).join('')
       )
     );
-
-    Lightbox.refresh();
-    // onSimpleLightBox();
-
     pagesLeft -= per_page;
   }
+  lightBox.refresh();
 }
 
-// function onSimpleLightBox() {
-//   new SimpleLightbox('.photo-card a', {
-//     captionsData: 'alt',
-//     captionDelay: 250,
-//   });
-// }
-function onSimpleLightBox() {
-  new SimpleLightbox('.photo-card a', {
-    captionsData: 'alt',
-    captionDelay: 250,
-  });
-}
-// let gallery = new SimpleLightbox('.photo-card a', {
-//   captionsData: 'alt',
-//   captionDelay: 250,
-// });
-// var gallery = $('.gallery a').simpleLightbox();
-
-// gallery.refresh();
+const lightBox = new SimpleLightBox('.gallery a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
