@@ -50,11 +50,16 @@ async function handleSubmit(e) {
   photo = e.currentTarget.elements.searchQuery.value;
   galleryEll.innerHTML = '';
   await getImg(photo, page).then(response => {
+    if (photo === ' ' || photo === '') {
+      Notiflix.Notify.failure('Please type search and try again.');
+      return;
+    }
     pagesLeft = response.data.totalHits;
     if (response.data.hits.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
+      return;
     } else {
       Notiflix.Notify.success(`Hooray! We found ${pagesLeft} images.`);
       galleryEll.insertAdjacentHTML(
@@ -90,4 +95,13 @@ async function handleLoadMore() {
 const lightBox = new SimpleLightBox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
+});
+
+const { height: cardHeight } = document
+  .querySelector('.gallery')
+  .firstElementChild.getBoundingClientRect();
+
+window.scrollBy({
+  top: cardHeight * 2,
+  behavior: 'smooth',
 });
